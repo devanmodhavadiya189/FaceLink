@@ -47,14 +47,17 @@ function useWebRTC() {
       });
 
       pc.ontrack = (event) => {
+        console.log('received remote track:', event);
         const [remotestream] = event.streams;
         if (remotevideoref.current) {
           remotevideoref.current.srcObject = remotestream;
+          console.log('set remote video stream:', remotestream);
         }
       };
 
       pc.onicecandidate = (event) => {
         if (event.candidate && socket) {
+          console.log('sending ice candidate:', event.candidate);
           const candidatedata = {
             candidate: event.candidate.candidate,
             sdpmid: event.candidate.sdpMid,
@@ -65,6 +68,14 @@ function useWebRTC() {
             candidate: candidatedata
           });
         }
+      };
+
+      pc.oniceconnectionstatechange = () => {
+        console.log('ice connection state:', pc.iceConnectionState);
+      };
+
+      pc.onconnectionstatechange = () => {
+        console.log('connection state:', pc.connectionState);
       };
 
       return true;
@@ -78,9 +89,11 @@ function useWebRTC() {
     if (!peerconnectionref.current || !socket) return;
 
     try {
+      console.log('creating offer for:', targetuserid);
       const offer = await peerconnectionref.current.createOffer();
       await peerconnectionref.current.setLocalDescription(offer);
       
+      console.log('sending offer:', offer);
       socket.emit('offer', {
         targetuserid,
         offer
@@ -94,10 +107,12 @@ function useWebRTC() {
     if (!peerconnectionref.current || !socket) return;
 
     try {
+      console.log('received offer from:', offerdata.fromuserid, offerdata.offer);
       await peerconnectionref.current.setRemoteDescription(offerdata.offer);
       const answer = await peerconnectionref.current.createAnswer();
       await peerconnectionref.current.setLocalDescription(answer);
       
+      console.log('sending answer:', answer);
       socket.emit('answer', {
         targetuserid: offerdata.fromuserid,
         answer
@@ -111,7 +126,9 @@ function useWebRTC() {
     if (!peerconnectionref.current) return;
 
     try {
+      console.log('received answer from:', answerdata.fromuserid, answerdata.answer);
       await peerconnectionref.current.setRemoteDescription(answerdata.answer);
+      console.log('answer processed successfully');
     } catch (error) {
       console.error('error handling answer:', error);
     }
@@ -153,6 +170,7 @@ function useWebRTC() {
     localvideoref,
     remotevideoref,
     localstreamref,
+    peerconnectionref,
     startcamerapreview,
     setupcall,
     makecall,
