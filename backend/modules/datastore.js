@@ -1,15 +1,14 @@
 const offers = [];
 const connectedsockets = [];
 
-const addoffer = (username, offer, roomid) => {
+const addoffer = (username, offer) => {
   offers.push({
     offererusername: username,
     offer: offer,
     offericecandidates: [],
     answererusername: null,
     answer: null,
-    answericecandidates: [],
-    roomid: roomid
+    answericecandidates: []
   });
   return offers[offers.length - 1];
 };
@@ -39,12 +38,17 @@ const addicecandidatetoofferer = (username, icecandidate) => {
   return offer;
 };
 
-const addsocket = (socketid, username, roomid) => {
+const addsocket = (socketid, username) => {
+  const existinguser = connectedsockets.find(s => s.username === username);
+  if (existinguser) {
+    return { success: false, message: 'username already taken' };
+  }
+  
   connectedsockets.push({
     socketid: socketid,
-    username: username,
-    roomid: roomid
+    username: username
   });
+  return { success: true, message: 'user connected' };
 };
 
 const findsocketbyusername = (username) => {
@@ -58,6 +62,14 @@ const removesocket = (socketid) => {
   }
 };
 
+const checktargetuser = (targetusername) => {
+  return connectedsockets.find(s => s.username === targetusername);
+};
+
+const getallusers = () => {
+  return connectedsockets.map(s => s.username);
+};
+
 module.exports = {
   offers,
   connectedsockets,
@@ -68,5 +80,7 @@ module.exports = {
   addicecandidatetoofferer,
   addsocket,
   findsocketbyusername,
-  removesocket
+  removesocket,
+  checktargetuser,
+  getallusers
 };
