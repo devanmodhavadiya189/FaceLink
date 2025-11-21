@@ -1,0 +1,31 @@
+@media (max-width: 768px) {
+  .main {
+    flex-direction: column;
+    padding: 0.5rem;
+    max-width: 100vw;
+  }
+  
+  .controlsection {
+    width: 100%;
+    max-width: none;
+    order: 2;
+  }
+  
+  .videosection {
+    order: 1;
+  }
+  
+  .videocontainer {
+    grid-template-columns: 1fr;
+    height: 50vh;
+    gap: 1rem;
+  }
+  
+  .videocontainer.incall {
+    height: 60vh;
+  }
+  
+  .videobox {
+    height: 250px;
+  }
+}

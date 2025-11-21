@@ -8,10 +8,9 @@ function VideoSection({
   remotevideoref,
   localstreamref 
 }) {
-  // Only start camera when in call or when user is ready to connect
   useEffect(() => {
     const startcamera = async () => {
-      if (!incall) return; // Only start camera when actually in a call
+      if (!incall) return;
       
       try {
         const stream = await navigator.mediaDevices.getUserMedia({ 
@@ -30,7 +29,6 @@ function VideoSection({
     if (incall) {
       startcamera();
     } else {
-      // Stop camera when not in call
       if (localstreamref.current) {
         localstreamref.current.getTracks().forEach(track => track.stop());
         localstreamref.current = null;
